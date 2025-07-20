@@ -243,12 +243,60 @@ require_once dirname(__DIR__) . '/includes/header.php';
     
     function copyToClipboard(recordId) {
         const content = document.getElementById('content-' + recordId).textContent;
-        navigator.clipboard.writeText(content).then(function() {
-            showMessage('已复制到剪贴板', 'success');
-        }).catch(function(err) {
-            console.error('复制失败: ', err);
-            showMessage('复制失败，请手动复制', 'error');
-        });
+        
+        // 尝试使用现代 Clipboard API
+        if (navigator.clipboard && window.isSecureContext) {
+            navigator.clipboard.writeText(content).then(function() {
+                showMessage('已复制到剪贴板', 'success');
+            }).catch(function(err) {
+                console.error('Clipboard API 失败: ', err);
+                fallbackCopy(content);
+            });
+        } else {
+            // 备用方案：文本选择
+            fallbackCopy(content);
+        }
+    }
+    
+    function fallbackCopy(text) {
+        // 创建临时文本区域
+        const textArea = document.createElement('textarea');
+        textArea.value = text;
+        textArea.style.position = 'fixed';
+        textArea.style.left = '-999999px';
+        textArea.style.top = '-999999px';
+        document.body.appendChild(textArea);
+        
+        try {
+            textArea.focus();
+            textArea.select();
+            
+            // 对于移动设备，需要设置选择范围
+            if (navigator.userAgent.match(/ipad|iphone/i)) {
+                textArea.contentEditable = true;
+                textArea.readOnly = false;
+                const range = document.createRange();
+                range.selectNodeContents(textArea);
+                const selection = window.getSelection();
+                selection.removeAllRanges();
+                selection.addRange(range);
+                textArea.setSelectionRange(0, 999999);
+            } else {
+                textArea.setSelectionRange(0, textArea.value.length);
+            }
+            
+            const successful = document.execCommand('copy');
+            if (successful) {
+                showMessage('已复制到剪贴板', 'success');
+            } else {
+                showMessage('复制失败，请长按文本手动复制', 'error');
+            }
+        } catch (err) {
+            console.error('备用复制方案失败: ', err);
+            showMessage('复制失败，请长按文本手动复制', 'error');
+        } finally {
+            document.body.removeChild(textArea);
+        }
     }
     
     function deleteRecord(recordId) {
