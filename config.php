@@ -8,7 +8,7 @@ define('MAX_CONTENT_LENGTH', 10000); // 最大内容长度（字符）
 define('CLIPBOARD_FILE', 'copy.txt');
 define('HISTORY_FILE', 'history.txt');
 define('DATABASE_FILE', 'clipboard.db');
-define('BASE_URL', 'https://suhw1999.cn/clipboard');
+define('BASE_URL', '####your_baseURL####');
 
 // 安全配置
 define('CSRF_TOKEN_NAME', 'csrf_token');
