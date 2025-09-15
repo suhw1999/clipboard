@@ -88,7 +88,14 @@ require_once 'includes/header.php';
 
 <textarea style="margin-bottom: 0px;" placeholder="剪切板为空！" readonly><?php echo $existing_content; ?></textarea>
 <textarea style="margin-bottom: 0px;" id="content" placeholder="请输入要复制的内容" maxlength="<?php echo MAX_CONTENT_LENGTH; ?>"></textarea>
-<button style="margin-bottom: 0px;" onclick="submitContent()">提交</button>
+<nav class="submit-nav">
+    <ul>
+        <li onclick="submitContent()" style="margin-bottom: 0px;">
+            提交
+            <span></span><span></span><span></span><span></span>
+        </li>
+    </ul>
+</nav>
 
 <nav>
     <ul>
