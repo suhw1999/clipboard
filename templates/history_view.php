@@ -92,21 +92,84 @@ $additional_head_content = '
         opacity: 0.6;
         pointer-events: none;
     }
-    .success-message {
-        background: #4CAF50;
-        color: #fff;
-        padding: 10px;
-        border-radius: 5px;
-        margin: 10px 0;
-        text-align: center;
+
+    /* 消息容器 - 右上角固定定位 */
+    #message-container {
+        position: fixed;
+        top: 100px;
+        right: 20px;
+        z-index: 9999;
+        max-width: 350px;
+        width: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        pointer-events: none;
     }
-    .error-message {
-        background: #f44336;
+
+    /* 成功和错误消息样式 */
+    .success-message, .error-message {
+        padding: 15px 20px;
+        border-radius: 8px;
+        text-align: left;
+        font-weight: bold;
+        font-size: 15px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        pointer-events: auto;
+        min-width: 250px;
+        position: relative;
+        overflow: hidden;
+        animation: slideInRight 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        transform-origin: right center;
+    }
+
+    .success-message {
+        background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
         color: #fff;
-        padding: 10px;
-        border-radius: 5px;
-        margin: 10px 0;
-        text-align: center;
+        border-left: 5px solid #2e7d32;
+    }
+
+    .error-message {
+        background: linear-gradient(135deg, #f44336 0%, #e53935 100%);
+        color: #fff;
+        border-left: 5px solid #c62828;
+    }
+
+    .success-message.fade-out, .error-message.fade-out {
+        animation: slideOutRight 0.3s ease-in forwards;
+    }
+
+    /* 进入动画 */
+    @keyframes slideInRight {
+        0% {
+            transform: translateX(400px);
+            opacity: 0;
+        }
+        60% {
+            transform: translateX(-10px);
+        }
+        100% {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
+
+    /* 退出动画 */
+    @keyframes slideOutRight {
+        0% {
+            transform: translateX(0);
+            opacity: 1;
+        }
+        100% {
+            transform: translateX(400px);
+            opacity: 0;
+        }
+    }
+
+    /* 悬停效果 */
+    .success-message:hover, .error-message:hover {
+        transform: scale(1.02);
+        transition: transform 0.2s ease;
     }
     
     /* 响应式设计 */
@@ -144,6 +207,19 @@ $additional_head_content = '
             max-height: 250px;
             font-size: 14px;
         }
+
+        /* 消息容器响应式 */
+        #message-container {
+            top: 120px;
+            right: 15px;
+            max-width: 420px;
+        }
+        .success-message, .error-message {
+            font-size: 14px;
+            padding: 12px 16px;
+            min-width: auto;
+            max-width: 100%;
+        }
     }
     
     @media (max-width: 480px) {
@@ -176,6 +252,20 @@ $additional_head_content = '
         .history-timestamp {
             font-size: 14px;
         }
+
+        /* 消息容器响应式 */
+        #message-container {
+            top: 140px;
+            right: 10px;
+            max-width: 320px;
+        }
+        .success-message, .error-message {
+            font-size: 13px;
+            padding: 10px 14px;
+            min-width: auto;
+            width: auto;
+            max-width: 100%;
+        }
     }
     
     @media (max-width: 360px) {
@@ -187,6 +277,18 @@ $additional_head_content = '
         .btn {
             padding: 5px 10px;
             font-size: 12px;
+        }
+
+        /* 消息容器响应式 */
+        #message-container {
+            right: 8px;
+            max-width: 260px;
+        }
+        .success-message, .error-message {
+            font-size: 12px;
+            padding: 8px 12px;
+            width: auto;
+            max-width: 100%;
         }
     }
     </style>';
@@ -204,10 +306,10 @@ require_once dirname(__DIR__) . '/includes/header.php';
             </li></a>
         </ul>
     </nav>
-    
+
+    <div id="message-container"></div>
+
     <div class='history-container'>
-        <div id="message-container"></div>
-        
         <?php if (empty($records)): ?>
             <div class='no-records'>暂无历史记录</div>
         <?php else: ?>
@@ -228,17 +330,49 @@ require_once dirname(__DIR__) . '/includes/header.php';
     
     <script>
     const csrfToken = '<?php echo htmlspecialchars($csrfToken ?? '', ENT_QUOTES, 'UTF-8'); ?>';
-    
+
     function showMessage(message, type = 'success') {
         const container = document.getElementById('message-container');
+
+        // 限制最大消息数量为5条
+        const maxMessages = 5;
+        const existingMessages = container.querySelectorAll('.success-message, .error-message');
+        if (existingMessages.length >= maxMessages) {
+            removeMessage(existingMessages[0]);
+        }
+
         const messageDiv = document.createElement('div');
         messageDiv.className = type + '-message';
         messageDiv.textContent = message;
         container.appendChild(messageDiv);
-        
-        setTimeout(() => {
-            container.removeChild(messageDiv);
+
+        // 自动消失计时器
+        let timeoutId = setTimeout(() => {
+            removeMessage(messageDiv);
         }, 3000);
+
+        // 鼠标悬停时暂停计时器
+        messageDiv.addEventListener('mouseenter', () => {
+            clearTimeout(timeoutId);
+        });
+
+        messageDiv.addEventListener('mouseleave', () => {
+            timeoutId = setTimeout(() => {
+                removeMessage(messageDiv);
+            }, 1500);
+        });
+    }
+
+    function removeMessage(messageElement) {
+        if (!messageElement || !messageElement.parentNode) return;
+
+        messageElement.classList.add('fade-out');
+
+        setTimeout(() => {
+            if (messageElement.parentNode) {
+                messageElement.parentNode.removeChild(messageElement);
+            }
+        }, 300);
     }
     
     function copyToClipboard(recordId) {
