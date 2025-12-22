@@ -93,10 +93,10 @@ $additional_head_content = '
         pointer-events: none;
     }
 
-    /* 消息容器 - 右上角固定定位 */
+    /* 消息容器 - 右上角固定定位（相对于视口，不受body padding影响） */
     #message-container {
         position: fixed;
-        top: 100px;
+        top: 20px;
         right: 20px;
         z-index: 9999;
         max-width: 350px;
@@ -116,7 +116,7 @@ $additional_head_content = '
         font-size: 15px;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
         pointer-events: auto;
-        min-width: 250px;
+        width: fit-content;
         position: relative;
         overflow: hidden;
         animation: slideInRight 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
@@ -210,7 +210,7 @@ $additional_head_content = '
 
         /* 消息容器响应式 */
         #message-container {
-            top: 120px;
+            top: 20px;
             right: 15px;
             max-width: 420px;
         }
@@ -255,7 +255,7 @@ $additional_head_content = '
 
         /* 消息容器响应式 */
         #message-container {
-            top: 140px;
+            top: 20px;
             right: 10px;
             max-width: 320px;
         }
