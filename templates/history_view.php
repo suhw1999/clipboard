@@ -52,6 +52,9 @@ $additional_head_content = '
         margin: 0px 20px;
         line-height: 20px;
     }
+    .btn:focus {
+        border: 2px solid  #fff;
+    }
     .btn:hover {
         background: #fff;
         color: #575757;

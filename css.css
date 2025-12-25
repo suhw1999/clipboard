@@ -13,7 +13,7 @@ body{
     align-items: center;
     justify-content: center;
     /* 渐变背景 */
-    background: linear-gradient(200deg,#575757,#575757);
+    background: #575757;
 }
 div.copy{
     width: auto;
@@ -100,7 +100,7 @@ button{
     font-weight: bold;
 }
 button:focus {
-  border: 2px solid  #fff;
+  border: 3px solid  #fff;
   outline: none;
 }
 button:hover{

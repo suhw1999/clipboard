@@ -15,36 +15,22 @@ $additional_head_content = '
     .auth-title {
         color: #fff;
         font-size: 24px;
-        margin-bottom: 20px;
-        font-weight: bold;
-    }
-    .form-group {
-        margin-bottom: 20px;
-        text-align: left;
-    }
-    .form-label {
-        color: #fff;
-        display: block;
-        margin-bottom: 8px;
+        margin-bottom: 15px;
         font-weight: bold;
     }
     .form-input {
         width: 240px;
-        height: 40px;
-        padding: 10px;
+        height: 60px;
         border: 3px solid #fff;
         border-radius: 10px;
         background: #575757;
         color: #fff;
         font-weight: bold;
         text-align: center;
-        line-height: 40px;
-        box-sizing: border-box;
-        margin: 0 auto;
-        display: block;
+        line-height: 60px;
+        margin: 0;
     }
     .form-input:focus {
-        border: 3px solid #fff;
         outline: none;
     }
     .form-input::placeholder {
@@ -55,30 +41,16 @@ $additional_head_content = '
         color: #fff;
         padding: 10px;
         border-radius: 10px;
-        margin: 15px 0;
-        text-align: center;
+        margin-bottom: 20px;
         border: 3px solid #fff;
     }
-    .back-link {
-        color: #fff;
-        text-decoration: none;
-        margin-top: 20px;
-        display: inline-block;
-        font-weight: bold;
+    .auth-container nav ul {
+        display: flex;
+        justify-content: center;
     }
-    .back-link:hover {
-        color: #ccc;
+    .auth-container nav ul li {
+        margin: 20px 0 0 0;
     }
-    
-    button{
-        margin: 0 0px;
-    }
-    button:disabled {
-        opacity: 0.6;
-        cursor: not-allowed;
-        background: #575757 !important;
-    }
-    
     @media (max-width: 480px) {
         .auth-container {
             width: 280px;
@@ -103,32 +75,41 @@ require_once dirname(__DIR__) . '/includes/header.php';
         <?php endif; ?>
         
         <form class='auth-form' method='POST' id='authForm'>
-            <div class='form-group'>
-                <input type='password' 
-                       id='password' 
-                       name='password' 
-                       class='form-input' 
-                       placeholder='请输入访问密码'
-                       required
-                       autofocus>
-            </div>
-            
-            <button type='submit' id='submitBtn'>
-                验证
-            </button>
+            <input type='password'
+                   id='password'
+                   name='password'
+                   class='form-input'
+                   placeholder='请输入访问密码'
+                   required
+                   autofocus>
+            <nav>
+                <ul>
+                    <li id='submitBtn' onclick='document.getElementById("authForm").submit()'>
+                        验证
+                        <span></span><span></span><span></span><span></span>
+                    </li>
+                </ul>
+            </nav>
         </form>
         
-        <a href='<?php echo BASE_URL; ?>' class='back-link'>返回剪切板</a>
+        <nav>
+            <ul>
+                <a href='<?php echo BASE_URL; ?>'><li>
+                    返回剪切板
+                    <span></span><span></span><span></span><span></span>
+                </li></a>
+            </ul>
+        </nav>
     </div>
     
     <script>
     document.getElementById('authForm').addEventListener('submit', function(e) {
         const submitBtn = document.getElementById('submitBtn');
-        submitBtn.disabled = true;
+        submitBtn.style.pointerEvents = 'none';
+        submitBtn.style.opacity = '0.6';
+        const spans = submitBtn.querySelectorAll('span');
         submitBtn.textContent = '验证中...';
+        spans.forEach(span => submitBtn.appendChild(span));
     });
-    
-    // 自动聚焦到密码输入框
-    document.getElementById('password').focus();
     </script>
 <?php require_once dirname(__DIR__) . '/includes/footer.php'; ?>
