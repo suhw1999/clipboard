@@ -9,8 +9,8 @@ function loadEnv($path) {
         list($name, $value) = explode('=', $line, 2);
         $name = trim($name);
         $value = trim($value);
-        if (!getenv($name)) {
-            putenv("$name=$value");
+        if (!isset($_ENV[$name])) {
+            $_ENV[$name] = $value;
         }
     }
 }
@@ -18,10 +18,11 @@ function loadEnv($path) {
 loadEnv(__DIR__ . '/.env');
 
 // 应用配置（从环境变量读取敏感配置）
-define('APP_PASSWORD_HASH', getenv('APP_PASSWORD_HASH', ''));
+define('APP_PASSWORD_HASH', $_ENV['APP_PASSWORD_HASH'] ?? '');
 define('MAX_CONTENT_LENGTH', 10000); // 最大内容长度（字符）
-define('DATABASE_FILE', getenv('DATABASE_FILE', 'clipboard.db'));
-define('BASE_URL', getenv('BASE_URL', '/clipboard'));
+define('DATABASE_FILE', $_ENV['DATABASE_FILE'] ?? 'clipboard.db');
+define('BASE_URL', $_ENV['BASE_URL'] ?? '/clipboard');
+define('FILE_PERMISSIONS', 0644);
 
 // 安全配置
 define('CSRF_TOKEN_NAME', 'csrf_token');
