@@ -414,7 +414,6 @@ nav ul li span:nth-child(4),
 .btn:hover {
     background: var(--color-primary);
     color: var(--color-bg-dark);
-    transform: translateY(-2px);
 }
 
 .btn-copy {
