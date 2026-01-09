@@ -12,37 +12,37 @@ require_once dirname(__DIR__) . '/includes/header.php';
                 返回剪切板
                 <span></span><span></span><span></span><span></span>
             </li></a>
-            <a href='javascript:void(0)' onclick='clearAllRecords()'><li>
+            <li data-action='clear-all'>
                 清空历史记录
                 <span></span><span></span><span></span><span></span>
-            </li></a>
+            </li>
         </ul>
     </nav>
 
     <div id="message-container"></div>
 
-    <div class='history-container'>
+    <main class='history-container'>
         <?php if (empty($records)): ?>
             <div class='no-records'>暂无历史记录</div>
         <?php else: ?>
             <?php foreach ($records as $id => $record): ?>
-                <div class='history-item' id='item-<?php echo $id; ?>'>
-                    <div class='history-header'>
-                        <div class='history-timestamp'><?php echo htmlspecialchars($record['timestamp']); ?></div>
+                <article class='history-item' id='item-<?php echo $id; ?>'>
+                    <header class='history-header'>
+                        <time class='history-timestamp'><?php echo htmlspecialchars($record['timestamp']); ?></time>
                         <div class='history-actions'>
-                            <button class='btn btn-copy' onclick='copyToClipboard(<?php echo $id; ?>)'>复制</button>
-                            <button class='btn btn-delete' onclick='deleteRecord(<?php echo $id; ?>)'>删除</button>
+                            <button class='btn btn-copy' data-action='copy' data-id='<?php echo $id; ?>'>复制</button>
+                            <button class='btn btn-delete' data-action='delete' data-id='<?php echo $id; ?>'>删除</button>
                         </div>
-                    </div>
+                    </header>
                     <div class='history-content' id='content-<?php echo $id; ?>'><?php echo htmlspecialchars($record['content']); ?></div>
-                </div>
+                </article>
             <?php endforeach; ?>
 
         <?php endif; ?>
 
         <!-- 分页导航容器 -->
         <div class="pagination-container"></div>
-    </div>
+    </main>
 
     <script>
     HistoryApp.init({

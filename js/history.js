@@ -28,6 +28,9 @@ const HistoryApp = {
         // 事件委托：分页按钮点击
         this.initPaginationEvents();
 
+        // 事件委托：操作按钮点击
+        this.initActionEvents();
+
         // 监听浏览器前进/后退
         this.initHistoryListener();
 
@@ -37,6 +40,31 @@ const HistoryApp = {
         if (!isNaN(urlPage) && urlPage > 1 && urlPage !== config.currentPage) {
             this.changePage(urlPage);
         }
+    },
+
+    /**
+     * 初始化操作按钮事件（事件委托）
+     */
+    initActionEvents() {
+        document.addEventListener('click', (e) => {
+            const btn = e.target.closest('[data-action]');
+            if (!btn) return;
+
+            const action = btn.dataset.action;
+            const id = parseInt(btn.dataset.id, 10);
+
+            switch (action) {
+                case 'copy':
+                    this.copyToClipboard(id);
+                    break;
+                case 'delete':
+                    this.deleteRecord(id);
+                    break;
+                case 'clear-all':
+                    this.clearAllRecords();
+                    break;
+            }
+        });
     },
 
     /**
@@ -191,17 +219,17 @@ const HistoryApp = {
         // 渲染新记录（插入到分页区域之前）
         const paginationEl = container.querySelector('.pagination-container');
         records.forEach(record => {
-            const item = document.createElement('div');
+            const item = document.createElement('article');
             item.className = 'history-item';
             item.id = 'item-' + record.id;
             item.innerHTML = `
-                <div class='history-header'>
-                    <div class='history-timestamp'>${this.escapeHtml(record.timestamp)}</div>
+                <header class='history-header'>
+                    <time class='history-timestamp'>${this.escapeHtml(record.timestamp)}</time>
                     <div class='history-actions'>
-                        <button class='btn btn-copy' onclick='HistoryApp.copyToClipboard(${record.id})'>复制</button>
-                        <button class='btn btn-delete' onclick='HistoryApp.deleteRecord(${record.id})'>删除</button>
+                        <button class='btn btn-copy' data-action='copy' data-id='${record.id}'>复制</button>
+                        <button class='btn btn-delete' data-action='delete' data-id='${record.id}'>删除</button>
                     </div>
-                </div>
+                </header>
                 <div class='history-content' id='content-${record.id}'>${this.escapeHtml(record.content)}</div>
             `;
             if (paginationEl) {

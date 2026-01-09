@@ -72,22 +72,33 @@ const MessageSystem = {
 };
 
 // ============================================
-// AJAX 请求封装
+// AJAX 请求封装（重构后）
 // ============================================
 const API = {
     timeout: 30000, // 30秒超时
 
-    async post(url, data, options = {}) {
+    /**
+     * 内部请求处理方法
+     * @private
+     */
+    async _request(url, options = {}) {
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), options.timeout || this.timeout);
+        const timeoutId = setTimeout(
+            () => controller.abort(),
+            options.timeout || this.timeout
+        );
 
         try {
-            const response = await fetch(url, {
-                method: 'POST',
-                body: data,
+            const fetchOptions = {
+                method: options.method || 'GET',
                 signal: controller.signal
-            });
+            };
 
+            if (options.body) {
+                fetchOptions.body = options.body;
+            }
+
+            const response = await fetch(url, fetchOptions);
             clearTimeout(timeoutId);
 
             if (!response.ok) {
@@ -105,31 +116,12 @@ const API = {
         }
     },
 
+    async post(url, data, options = {}) {
+        return this._request(url, { ...options, method: 'POST', body: data });
+    },
+
     async get(url, options = {}) {
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), options.timeout || this.timeout);
-
-        try {
-            const response = await fetch(url, {
-                method: 'GET',
-                signal: controller.signal
-            });
-
-            clearTimeout(timeoutId);
-
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-
-            return await response.json();
-        } catch (error) {
-            clearTimeout(timeoutId);
-
-            if (error.name === 'AbortError') {
-                throw new Error('请求超时，请检查网络连接');
-            }
-            throw error;
-        }
+        return this._request(url, { ...options, method: 'GET' });
     }
 };
 
@@ -221,11 +213,49 @@ const Utils = {
     }
 };
 
+// ============================================
+// 统一错误处理器
+// ============================================
+const ErrorHandler = {
+    /**
+     * 统一处理错误
+     * @param {Error} error - 错误对象
+     * @param {string} defaultMessage - 默认错误消息
+     * @param {boolean} showAlert - 是否使用 alert 显示（否则使用 MessageSystem）
+     */
+    handle(error, defaultMessage = '操作失败', showAlert = false) {
+        console.error('Error:', error);
+        const message = error.message || defaultMessage;
+
+        if (showAlert) {
+            alert(message);
+        } else {
+            MessageSystem.error(message);
+        }
+    },
+
+    /**
+     * 包装异步函数，自动处理错误
+     * @param {Function} fn - 异步函数
+     * @param {Object} options - 错误处理选项
+     */
+    wrap(fn, options = {}) {
+        return async (...args) => {
+            try {
+                return await fn(...args);
+            } catch (error) {
+                this.handle(error, options.defaultMessage, options.showAlert);
+            }
+        };
+    }
+};
+
 // 导出到全局（兼容非模块环境）
 window.MessageSystem = MessageSystem;
 window.API = API;
 window.ClipboardUtil = ClipboardUtil;
 window.Utils = Utils;
+window.ErrorHandler = ErrorHandler;
 
 // 简化的全局函数
 window.showMessage = (message, type) => MessageSystem.show(message, type);

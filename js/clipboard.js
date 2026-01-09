@@ -32,6 +32,17 @@ const ClipboardApp = {
                     this.submitContent();
                 }
             });
+
+            // 事件委托：处理 data-action 按钮点击
+            document.addEventListener('click', (e) => {
+                const actionElement = e.target.closest('[data-action]');
+                if (actionElement) {
+                    const action = actionElement.dataset.action;
+                    if (action === 'submit') {
+                        this.submitContent();
+                    }
+                }
+            });
         });
     },
 
