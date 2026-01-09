@@ -28,9 +28,6 @@ define('CSRF_TOKEN_NAME', 'csrf_token');
 define('SESSION_TIMEOUT', 604800); // 会话超时时间（秒）= 7天
 define('SESSION_COOKIE_LIFETIME', 604800); // Cookie 保持时间（秒）= 7天
 
-// 文件权限
-define('FILE_PERMISSIONS', 0644);
-
 // 启用会话
 if (session_status() === PHP_SESSION_NONE) {
     // 设置 Session Cookie 参数：7天有效期 + 安全选项
@@ -70,15 +67,4 @@ function validateInput($content) {
     return ['valid' => true, 'error' => null];
 }
 
-// 安全文件写入函数
-function secureFileWrite($filename, $content, $append = false) {
-    $flags = $append ? FILE_APPEND | LOCK_EX : LOCK_EX;
-    
-    if (file_put_contents($filename, $content, $flags) === false) {
-        return false;
-    }
-    
-    chmod($filename, FILE_PERMISSIONS);
-    return true;
-}
 ?>
