@@ -35,7 +35,7 @@ $additional_head_content = '
 require_once 'includes/header.php';
 ?>
 
-<textarea class="clipboard-display" placeholder="剪切板为空！" readonly><?php echo $existing_content; ?></textarea>
+<textarea class="clipboard-display" id="clipboard-display" placeholder="剪切板为空！" readonly><?php echo $existing_content; ?></textarea>
 <textarea class="clipboard-input" id="content" placeholder="请输入要复制的内容" maxlength="<?php echo MAX_CONTENT_LENGTH; ?>"></textarea>
 <nav class="submit-nav">
     <ul>
