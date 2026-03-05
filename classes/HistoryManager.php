@@ -49,8 +49,20 @@ class HistoryManager {
      * @return array 以ID为键的记录数组
      */
     public function getRecords() {
-        $dbRecords = $this->db->getAllRecords();
+        $dbRecords = $this->db->getRecordsPaginated(0, 100);
         return $this->transformRecords($dbRecords, true);
+    }
+
+    /**
+     * 获取最新一条记录
+     * @return array|null 转换后的记录或null
+     */
+    public function getLatestRecord() {
+        $dbRecord = $this->db->getLatestRecord();
+        if (!$dbRecord) {
+            return null;
+        }
+        return $this->transformRecord($dbRecord);
     }
 
     /**

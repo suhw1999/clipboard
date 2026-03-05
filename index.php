@@ -6,11 +6,10 @@ $existing_content = "";
 try {
     require_once 'classes/HistoryManager.php';
     $historyManager = new HistoryManager();
-    $records = $historyManager->getRecords();
+    $latestRecord = $historyManager->getLatestRecord();
     
-    if (!empty($records)) {
-        $latest_record = reset($records);
-        $existing_content = htmlspecialchars($latest_record['content']);
+    if ($latestRecord) {
+        $existing_content = htmlspecialchars($latestRecord['content']);
     }
 } catch (Exception $e) {
     error_log('Index.php error: ' . $e->getMessage());

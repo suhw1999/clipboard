@@ -41,6 +41,8 @@ class DatabaseManager {
         ";
         
         $this->db->exec($sql);
+        
+        $this->db->exec("CREATE INDEX IF NOT EXISTS idx_created_at ON clipboard_records(created_at DESC)");
     }
     
     public function getConnection() {
@@ -53,10 +55,10 @@ class DatabaseManager {
         return $stmt->execute([$content]);
     }
     
-    public function getAllRecords() {
-        $sql = "SELECT id, content, created_at FROM clipboard_records ORDER BY created_at DESC";
+    public function getLatestRecord() {
+        $sql = "SELECT id, content, created_at FROM clipboard_records ORDER BY created_at DESC LIMIT 1";
         $stmt = $this->db->query($sql);
-        return $stmt->fetchAll();
+        return $stmt->fetch();
     }
 
     /**
